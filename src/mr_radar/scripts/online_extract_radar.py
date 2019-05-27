@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-#file for connecting directly to the radar throught the media converter (no wireshark)
+
+#---------------------------------------------------------------------------#
+# The following code is used to listen to a UDP multicast broadcast from an
+# ARS430 module. Each UDP packet received is converted based on the packaging 
+# scheme provided by Continental. The subsequent data is the printed to the 
+# /radar_data topic using a custom message definition.
+#---------------------------------------------------------------------------#
 
 #importing ROS libraries
 import rospy
@@ -11,7 +17,6 @@ from mr_radar.msg import Radar_Data
 import socket
 import struct
 import binascii
-#import keyboard
 
 #modules for arrays
 import numpy as np 
@@ -25,11 +30,11 @@ class online_extract_radar(object):
 		#-----------------------Publisher-----------------------#
 		self.pub = rospy.Publisher("/radar_data", Radar_Data, queue_size = 1000) #publisher
 		
-		#-----------------------Socket-----------------------#
-		MCAST_GRP = '225.0.0.1'
-		MCAST_PORT = 31122
+		#---------------------Socket Setup----------------------#
+		MCAST_GRP = '225.0.0.1' #multicast group
+		MCAST_PORT = 31122 #multicast port
 		IS_ALL_GROUPS = True
-		interfaceIP = struct.unpack(">L", socket.inet_aton('192.168.1.30'))[0]
+		interfaceIP = struct.unpack(">L", socket.inet_aton('192.168.1.30'))[0] # radar IP
 		rospy.loginfo(interfaceIP)
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -51,6 +56,7 @@ class online_extract_radar(object):
 
 		rospy.loginfo('Connection Established') #prints in terminal	
 	
+	# Radar data publisher 
 	def publish_radar(self,ranges, azimuths, elevations, vels,  rcss, range_vars, az_vars, el_vars, vel_vars, snrs, actual_packet_count):
 		#create msg type
 		msg = Radar_Data()
@@ -77,9 +83,9 @@ if __name__ == '__main__':
 	try:
 		while not rospy.is_shutdown():
 			try:
-				data, addr = reader.sock.recvfrom(1500) #receive data
+				data, addr = reader.sock.recvfrom(1500) #receive data with a buffer of 1500 bytes
 				hexdata = binascii.hexlify(data)
-				#call conversion function
+				#call custom conversion function
 				(ranges, azimuths, elevations, vels,  rcss, range_vars, az_vars, el_vars, vel_vars, snrs, actual_packet_count) = convert_all_radar(hexdata, 0,0)
 				#publish data
 				if len(ranges)>0:

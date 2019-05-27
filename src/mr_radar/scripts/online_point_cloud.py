@@ -1,14 +1,25 @@
 #!/usr/bin/env python
 
-#-------------------------------------------------------------#
-# The following code is used to convert the radar data into a Point Cloud accepted by RVIZ
+#----------------------------------------------------------------------------------------------#
+# The following code is used to convert the radar data into a Point Cloud accepted by RVIZ. The
+# Pointcloud message type is used, with the channel type is set to intensity (the RCS value
+# provided for each point). The data is read from the /radar_data topic and the resulting point 
+# cloud is published to the /radar_cloud topic.
+#----------------------------------------------------------------------------------------------#
 
+# import ros library
 import rospy
+
+# import module for arrays
 import numpy as np
+
+# import message types
 from sensor_msgs.msg import PointCloud, ChannelFloat32
 from geometry_msgs.msg import Point32 
-from detection import spherical_to_3D
 from mr_radar.msg import Radar_Data
+
+# import function for Spherical to Cartesian conversion
+from detection import spherical_to_3D
 
 
 class online_point_cloud(object):

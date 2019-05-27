@@ -1,17 +1,24 @@
 #!/usr/bin/env python
-#file for detecting obstacles ahead of car
 
-#importing ROS libraries
+#---------------------------------------------------------------------------#
+# The following code is used to parse the radar data to verify if an obstacle
+# is present in front of the car. The data is read from the /radar_data topic
+# and is then parsed through using the flag_counter function. In the event of 
+# a set amount of detections (threshold variable found in bin_flag) a binary 
+# flag is published to the /radar_obstacle topic.
+#---------------------------------------------------------------------------#
+
+# import ROS libraries
 import rospy
 
-#import message type
+# import message type
 from mr_radar.msg import Radar_Data
 from std_msgs.msg import Int8
 
-#modules for arrays
+# import module for arrays
 import numpy as np 
 
-#module for hex conversions
+# function for detection check
 from detection import bin_flag, flag_counter 
 
 
@@ -37,7 +44,7 @@ class online_detect_radar(object):
 		self.time = 0 #time of packet
 		self.updated = False #update boolean
 
-	
+	# Callback to store published radar data
 	def get_info(self,msg):
 		if not(self.updated):
 			self.time = msg.header.stamp #packet time
@@ -54,6 +61,7 @@ class online_detect_radar(object):
 			self.updated = True #new information received
 		return
 	
+	# Publisher for binary flag
 	def pub(self,flag_raised):
 		self.brake.publish(flag_raised)
 		return
@@ -62,7 +70,7 @@ class online_detect_radar(object):
 if __name__ == '__main__':
 	rospy.init_node('Detection') #create node
 	detector = online_detect_radar() #create instance
-	flag_raised = 0
+	flag_raised = 0 #default value
 	try:
 		while not rospy.is_shutdown():
 
@@ -71,11 +79,8 @@ if __name__ == '__main__':
 				(detector.flag_counter) = flag_counter(detector.ranges, detector.azimuths, detector.elevations, detector.rcss, detector.rel_vels, detector.flag_counter,detector.snrs)    
 				flag_raised = bin_flag(detector.flag_counter)
 				detector.updated = False
-				#if verified obstacle
+			#if verified obstacle
 			if (flag_raised):
-				# flag_counter_string = "Flag Counter: " + str(detector.flag_counter)
-				# print(flag_counter_string)
-				# detector.pub(flag_raised) #publish to binary topic
 				detector.pub(flag_raised) #publish to binary topic
 				flag_raised = 0
 				detector.flag_counter = 0

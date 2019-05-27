@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-#file for connecting directly to the radar throught the media converter (no wireshark)
+
+#---------------------------------------------------------------------------#
+# The following code is used to perform a handshake with the ARS430 module to
+# verify the socket connection is working. A successful run will result in 
+# a "Connection Established" being printed to the console.
+#---------------------------------------------------------------------------#
 
 #importing ROS libraries
 import rospy
@@ -8,26 +13,16 @@ import rospy
 import socket
 import struct
 import binascii
-#import keyboard
-
-#modules for plotting
-import numpy as np 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import time
-
-#module for file management
-import os
-from common_functions import convert_all_radar
 
 class online_extract_radar(object):
 
 	def __init__(self):
-	
-		MCAST_GRP = '225.0.0.1'
-		MCAST_PORT = 31122
+		
+		#-----------------------Socket Setup-----------------------#
+		MCAST_GRP = '225.0.0.1' #multicast group
+		MCAST_PORT = 31122 #multicast port
 		IS_ALL_GROUPS = True
-		interfaceIP = struct.unpack(">L", socket.inet_aton('192.168.1.30'))[0]
+		interfaceIP = struct.unpack(">L", socket.inet_aton('192.168.1.30'))[0] #radar IP
 		rospy.loginfo(interfaceIP)
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -52,6 +47,3 @@ class online_extract_radar(object):
 if __name__ == '__main__':
 	rospy.init_node('Reader')
 	reader = online_extract_radar() #create instance
-	
-	
-	
