@@ -7,9 +7,9 @@ You will need to build this package using catkin.
 Currently configured to listen to IP address 192.168.1.30.
 Refer to ARS4EO documentation for further network configuration parameters.
 
-#The launch file radar.launch will run all the required nodes.
+**The launch file radar.launch will run all the required nodes.**
 
-#TOPICS:#
+***TOPICS:***
 
 **/radar_data:** Publishes arrays of data obtained from the RADAR per packet. Note that data consisting solely of 0s indicates no detections by the RADAR hence this topic will only output usable (non-zero values) from a particular packet. 
 
