@@ -10,6 +10,7 @@ Refer to ARS4EO documentation for further network configuration parameters.
 #The launch file radar.launch will run all the required nodes.
 
 #TOPICS:#
+
 **/radar_data:** Publishes arrays of data obtained from the RADAR per packet. Note that data consisting solely of 0s indicates no detections by the RADAR hence this topic will only output usable (non-zero values) from a particular packet. 
 
 These parameters are:
