@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Launch file to start the Radar communication and detection -->
+<!-- UTIAS AER1514 - Winter 2019 -->
+
+<launch>
+
+  <!-- Create ROS node that creates a socket connection and decodes data -->
+  <node name="reader" pkg="mr_radar" 
+    type="online_extract_radar.py" output="screen" required="True"/>
+  <!-- Create ROS node that uses radar data to detect obstacles in front of the vehicle -->
+  <node name="detection" pkg="mr_radar" 
+    type="online_detect_radar.py" output="screen" required="True"/>
+  <!-- Create ROS node that visualizes radar data -->
+  <node name="point_cloud" pkg="mr_radar" 
+    type="online_point_cloud.py" output="screen" required="True"/>
+
+</launch>
