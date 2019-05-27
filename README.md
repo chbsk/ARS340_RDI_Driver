@@ -5,7 +5,7 @@ This package is a driver (parsing and basic detection) for the Continental RADAR
 The package is written in python for ROS Kinetic.
 You will need to build this package using catkin.
 Currently configured to listen to IP address 192.168.1.30.
-Refer to ARS4EO documentation for further network configuration parameters.
+Refer to ARS340 RDI documentation for further network configuration parameters.
 
 **The launch file radar.launch will run all the required nodes.**
 
