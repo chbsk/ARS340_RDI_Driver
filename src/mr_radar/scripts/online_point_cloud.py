@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+#-------------------------------------------------------------#
+# The following code is used to convert the radar data into a Point Cloud accepted by RVIZ
+
 import rospy
 import numpy as np
 from sensor_msgs.msg import PointCloud, ChannelFloat32
@@ -20,18 +24,14 @@ class online_point_cloud(object):
 		self.rcss = np.zeros(10) #Radar Cross Section [dbm^2]
 		self.time = 0 #time of packet
 		self.pack_count = 1 #number of packets read
-		point = Point32()
-		point.x = 0
-		point.y = 0
-		point.z = 0
 		self.points = [] #list of Point32
-		#self.points.extend([point])
 		self.inty_vals = [] #list of intensity values
 		self.pack_thresh = 5 #number of packets displayed at once
 		self.updated = False #lock boolean
 		
+	# Callback to published radar data
 	def get_info(self,msg):
-		if not (self.updated):
+		if not (self.updated): #if the previous packet has been completely processed
 			self.updated = True
 			self.time = msg.header.stamp #packet time
 			self.ranges = np.array(msg.range) #ranges [m]
@@ -41,12 +41,13 @@ class online_point_cloud(object):
 			#call convert point
 			self.convert_point(self.ranges,self.azimuths,self.elevations,self.rcss)
 			#publish point cloud 
-			if self.pack_count % self.pack_thresh == 0:
+			if self.pack_count % self.pack_thresh == 0: #publish set amount of packets converted to point clouds
 				self.cloud_pub()
-			if self.pack_count >= 1000:
+			if self.pack_count >= 1000: #reset counter to avoid runoff
 				self.pack_count = 0
 		return
 	
+	# Convert and append data
 	def convert_point(self,ranges,azimuths,elevations,rcss):
 		self.pack_count += 1 #increment packet counter
 		#append channel intensity based on rcs
@@ -60,7 +61,8 @@ class online_point_cloud(object):
 			point.z = z[i]
 			self.points.extend([point])
 		self.updated = False
-			
+	
+	# Publish point cloud data after x amount of packets processed
 	def cloud_pub(self):
 		#create point cloud object
 		cloud = PointCloud()
@@ -79,8 +81,4 @@ class online_point_cloud(object):
 if __name__ == '__main__':
 	rospy.init_node('Radar_Cloud') #create node
 	p_cloud = online_point_cloud() #create instance
-	rospy.spin()	
-	
-		
-		
-
+	rospy.spin()
